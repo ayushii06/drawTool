@@ -19,3 +19,8 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+canvas{
+  width: 100vw;
+  height: 100vh;
+}
