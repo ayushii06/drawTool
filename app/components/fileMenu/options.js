@@ -12,9 +12,9 @@ import Link from 'next/link'
 
 export default function Options() {
     const dispatch = useDispatch()
-    const [isHidden, setIsHidden] = useState(false)
+    const [isHidden, setIsHidden] = useState(true)
     const [current, setCurrent] = useState('#ffffff')
-    const [help, setHelp] = useState(true)
+    const [help, setHelp] = useState(false)
 
     const handleClick = () => {
         setIsHidden(!isHidden)
