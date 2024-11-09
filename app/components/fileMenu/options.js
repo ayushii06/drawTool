@@ -108,7 +108,7 @@ export default function Options() {
                 <hr className='py-1'></hr>
                 <div className="flex flex-col">
                 <Link target='_blank' href='https://linkedin.com/in/ayushi-pal-99965b249/' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">LinkedIn</Link>
-                <Link target='_blank'  href='https://github.com/ayushii06' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">Github</Link>
+                <Link target='_blank'  href='https://github.com/ayushii06/drawTool' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">Github</Link>
                 <Link  target='_blank' href='https://drive.google.com/file/d/1263gzWPcWP8AbBrr6K7JR91WYV33tVRE/view?usp=drive_link' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-2">Contact Me</Link>
                 </div>
                 <hr className='py-2'></hr>
@@ -138,7 +138,7 @@ export default function Options() {
                 
                 <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">Help</h1>
-                    <Link target='blank' href='https://github.com/ayushii06' className='text-sm font-bold text-black rounded py-2 px-4 bg-gray-200 '>Contribute on Github</Link>
+                    <Link target='blank' href='https://github.com/ayushii06/drawTool' className='text-sm font-bold text-black rounded py-2 px-4 bg-gray-200 '>Contribute on Github</Link>
                 </div>
                 <hr className="my-4"/>
                 <p className="text-lg text-slate-800">This is a simple drawing app. You can draw, erase, write text, select, move, draw shapes, and change the background color of the canvas. You can also download the image. The app is created using Next.js, Redux, and Tailwind CSS.</p>
