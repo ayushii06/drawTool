@@ -820,21 +820,21 @@ export default function Home() {
       <div style={{zIndex:2}} className="absolute flex items-center bottom-4 right-2 rounded-xl bg-gray-100">
         <Image src={minus} alt="redo" onClick={()=>
           onZoom(-0.1)
-      } width={45} className="px-2 py-2 hover:bg-gray-300"/>
+      }  className="w-8 max-md:w-8 px-2 py-2 hover:bg-gray-300"/>
         <div onClick={()=>{
           setScale(1);
-        }} className="text-slate-800 px-2">{new Intl.NumberFormat('en-GB',{style:"percent"}).format(scale)}</div>
+        }} className="text-slate-800 px-2 max-md:text-sm">{new Intl.NumberFormat('en-GB',{style:"percent"}).format(scale)}</div>
         <Image src={plus} alt="undo" onClick={()=>{
           onZoom(0.1);
-        }} width={40} className="px-2 py-2 hover:bg-gray-300"/>
+        }} width={40} className="w-8 max-md:w-8 px-2 py-2 hover:bg-gray-300"/>
       </div>
 
-      <div style={{zIndex:2}} className="absolute flex items-center justify-center bottom-4 right-44 rounded-xl bg-gray-100">
-        <Image src={undoImg} alt="undo" onClick={undo}  width={60} className="px-4 py-2 hover:bg-gray-300"/>
-        <Image src={redoImg} alt="redo" onClick={redo}  width={60} className="px-4 py-2 hover:bg-gray-300"/>
+      <div style={{zIndex:2}} className="absolute flex items-center justify-center bottom-4 right-36 rounded-xl bg-gray-100">
+        <Image src={undoImg} alt="undo" onClick={undo}   className="w-12 max-md:w-12 px-4 py-2 hover:bg-gray-300"/>
+        <Image src={redoImg} alt="redo" onClick={redo}  className="w-12 max-md:w-12 px-4 py-2 hover:bg-gray-300"/>
       </div>
 
-      <p style={{zIndex:2}} className="font-bold absolute py-2 px-2 text-gray-400 flex items-center justify-center bottom-4 left-4 rounded-xl bg-gray-100">CREATED BY AYUSHI PAL</p>
+      <p style={{zIndex:2}} className="font-bold max-md:text-sm max-md:w-2/12 max-sm:bottom-16 max-sm:text-xs absolute py-2 px-2 text-gray-400 flex items-center justify-center bottom-4 left-4 rounded-xl bg-gray-100">CREATED BY AYUSHI PAL</p>
 
     </>
   );

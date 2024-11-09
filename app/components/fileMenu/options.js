@@ -58,7 +58,7 @@ export default function Options() {
         </div>
 
 
-        <div className="fixed right-5 px-4 py-4 top-16 text-slate-700"
+        <div className="fixed right-5 px-4 max-md:p-2 py-4 top-16 text-slate-700"
         style={{
             display: isHidden ? 'none' : 'block',
             zIndex: 1000,
@@ -72,15 +72,15 @@ export default function Options() {
 
                 {<div
                 onClick={handleDownload}
-                 className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4"><Image alt='image' width={20} src={download }/><p className="text-start py-1 ">Download Image</p></div>}
+                 className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4 max-md:pr-2 max-md:text-xs"><Image alt='image' width={20} src={download }/><p className="text-start py-1 ">Download Image</p></div>}
                 {/* <div
                 onClick={handleReset} 
-                className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4"><Image alt='image' width={20} src={ deletesvg}/><p className="text-start py-1 ">Reset Canvas</p></div> */}
+                className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4 max-md:pr-2 px-1 gap-2"><Image alt='image' width={20} src={ deletesvg}/><p className="text-start py-1 ">Reset Canvas</p></div> */}
                 <div onClick={()=>{setHelp(true)
                     setIsHidden(true)
-                }} className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4"><Image alt='image' width={20} src={ question}/><p className="text-start py-2 ">Help</p></div>
+                }} className="hover:bg-gray-300 rounded px-2 pr-6  flex items-center justify-start gap-4 max-md:pr-2 max-md:text-xs"><Image alt='image' width={20} src={ question}/><p className="text-start py-2 ">Help</p></div>
                 <hr className='py-1'/>
-                <p className="">Canvas Background</p>
+                <p className="max-md:text-xs">Canvas Background</p>
 
                 <div className="flex items-center justify-start gap-4 py-4">
                     {
@@ -96,7 +96,7 @@ export default function Options() {
             
 
                             >
-                                 <div className=" m-1" style={{ backgroundColor: Backgrounds[color], width: '22px', height: '22px' 
+                                 <div className=" m-1 w-4 h-4" style={{ backgroundColor: Backgrounds[color] 
                                 }}></div>
                                
                             </div>
@@ -107,12 +107,12 @@ export default function Options() {
 
                 <hr className='py-1'></hr>
                 <div className="flex flex-col">
-                <Link target='_blank' href='https://linkedin.com/in/ayushi-pal-99965b249/' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">LinkedIn</Link>
-                <Link target='_blank'  href='https://github.com/ayushii06/drawTool' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">Github</Link>
-                <Link  target='_blank' href='https://drive.google.com/file/d/1263gzWPcWP8AbBrr6K7JR91WYV33tVRE/view?usp=drive_link' className="hover:bg-gray-300 rounded px-2 pr-6 text-start py-2">Contact Me</Link>
+                <Link target='_blank' clas href='https://linkedin.com/in/ayushi-pal-99965b249/' className="max-md:text-xs hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">LinkedIn</Link>
+                <Link target='_blank' clas  href='https://github.com/ayushii06/drawTool' className="max-md:text-xs hover:bg-gray-300 rounded px-2 pr-6 text-start py-1">Github</Link>
+                <Link  target='_blank' clas href='https://drive.google.com/file/d/1263gzWPcWP8 AbBrr6K7JR91WYV33tVRE/view?usp=drive_link' className="max-md:text-xs hover:bg-gray-300 rounded px-2 pr-6 text-start py-2">Contact Me</Link>
                 </div>
                 <hr className='py-2'></hr>
-                <p className="text-start text-slate-400  text-sm ">© Ayushi Pal</p>
+                <p className="text-start text-slate-400  text-sm max-md:text-xs ">© Ayushi Pal</p>
 
             
       

@@ -20,21 +20,18 @@ export default function Toolbar() {
 
     return (
         
-        <div className="flex rounded bg-white py-1 w-5/12  mx-auto justify-evenly items-center" 
+        <div className="flex fixed left-72 max-sm:left-10  max-md:left-36 bottom-3 rounded bg-white py-1 w-5/12 max-md:w-6/12  mx-auto justify-evenly items-center" 
              style={{
                 boxShadow: '0px 0px 5px #000000',
-                position: 'fixed',
-                bottom: '18px',
-                left: '26%',
+             
                 zIndex: 1000,
              }}>
                 {
                     icons.map(icon => (
                         <Image
                             key={icon.id}
-                            height={40}
-                            width={40}
-                            className='p-2 rounded'
+                           
+                            className='p-2 rounded h-10 max-sm:h-8 w-10 max-sm:w-8'
                             src={icon.src}
                             alt={icon.alt}
                             style={{
