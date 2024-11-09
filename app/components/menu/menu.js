@@ -1,9 +1,11 @@
 'use client'
+import Image from "next/image"
 import { useState } from "react"
 import { colors, fillColors } from "@/app/constant"
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux"
 import { setColor, setSize, setSmoothing, setThinning, setStreamline, setFill ,setFillStyle,setStyle} from "../../slice/menuSlice"
+import colorWheel from "../../../public/toolbar/color-wheel.png"
 
 
 
@@ -76,7 +78,7 @@ export default function Menu() {
 
     return (
         <>
-            {(showStrokeTool || showColorTool || showPenTool || showFillTool) && <div style={{zIndex:100}} className="shadow-lg border-2 absolute top-1 left-2 rounded bg-white px-4 py-2 w-64">
+            {(showStrokeTool || showColorTool || showPenTool || showFillTool) && <div style={{zIndex:100}} className="shadow-lg border-2 absolute top-1 left-2 rounded bg-white px-5 py-2 w-72">
 
                 {showColorTool && <div className="text-start py-2">
                     <h4 className="text-slate-500 ">Color</h4>
@@ -97,8 +99,16 @@ export default function Menu() {
                                 >
                                 <div className="rounded m-1" style={{ backgroundColor: colors[color], width: '22px', height: '22px' 
                                 }}></div>
+                              
                                 </div>
                         ))}
+                        <label htmlFor="bgColor">
+    <Image src={colorWheel} alt="Color Picker Icon" width="28" height="28"/>
+  </label>
+  <input type="color" id="bgColor" name="bgColor" value="#ffffff" style={{display:"none"}}
+    onChange={(e) => changeColor(tool, e.target.value)}
+  />
+
                     </div>
                 </div>
                 }
@@ -161,7 +171,7 @@ export default function Menu() {
 
                 {showFillTool && <><div>
                     <h4 className="text-slate-500 ">Fill</h4>
-                    <div className="flex gap-2 py-4">
+                    <div className="flex gap-1 py-4">
                         {Object.keys(fillColors).map(color => (
                             <div key={color}
                                 onClick={() => changeFill(fillColors[color])}
@@ -178,6 +188,12 @@ export default function Menu() {
                                    
                                 
                         ))}
+                        <label htmlFor="fillColor">
+    <Image src={colorWheel} alt="Color Picker Icon" width="28" height="28"/>
+  </label>
+  <input type="color" id="fillColor" name="fillColor" value="#ffffff" style={{display:"none"}}
+    onChange={(e) => changeFill(e.target.value)}
+  />
                     </div>
                 </div>
 

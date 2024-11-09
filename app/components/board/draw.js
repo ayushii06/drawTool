@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useLayoutEffect, useRef, useEffect } from "react";
 import Image from "next/image";
 import rough from 'roughjs/bundled/rough.esm';
@@ -18,15 +17,14 @@ const createElements=(id,x1, y1, x2, y2, tool , color , size ,fill , style, fill
   switch (tool) {
     case 'line':
       const roughElementlie = generator.line(x1, y1, x2, y2, { stroke: color, strokeWidth: size , strokeLineDash: style === 'dashed' ? [5, 5] : style === 'dotted' ? [2, 2] : [] });
-      return { id,x1, y1, x2, y2, tool, roughElement: roughElementlie };
+      return { id,x1, y1, x2, y2, tool, roughElement: roughElementlie , color, size, fill, style, fillStyle};
       break;
 
     case 'rectangle':
       const roughElementrect = generator.rectangle(x1, y1, x2 - x1, y2 - y1, { stroke: color, strokeWidth: size, fill: fill, strokeLineDash: style === 'dashed' ? [5, 5] : style === 'dotted' ? [2, 2] : [],fillStyle:fillStyle  });
 
-      console.log(roughElementrect);
 
-      return {id, x1, y1, x2, y2, tool, roughElement:roughElementrect };
+      return {id, x1, y1, x2, y2, tool, roughElement:roughElementrect , color, size, fill, style, fillStyle};
       break;
 
     case 'circle':
@@ -35,8 +33,7 @@ const createElements=(id,x1, y1, x2, y2, tool , color , size ,fill , style, fill
 
 
       
-      console.log(roughElementcircle);
-      return { id, x1, y1, x2, y2, tool, roughElement: roughElementcircle };
+      return { id, x1, y1, x2, y2, tool, roughElement: roughElementcircle, color, size, fill, style, fillStyle};
       break;
 
     case 'pen':
@@ -52,10 +49,7 @@ const createElements=(id,x1, y1, x2, y2, tool , color , size ,fill , style, fill
       return { id, tool,x1,y1,x2,y2, color , size,  text: '' };
       break;
 
-    
-    case 'pan':
-      return ;
-    
+   
 
     default:
       break;
@@ -187,6 +181,7 @@ const positionWithinElement = (x, y, element) =>{
 }
 
 const getElementAtPosition = (x, y, elements)=> {
+
   return elements.map((element)=>({
     ...element,
     position: positionWithinElement(x, y, element)
@@ -254,7 +249,7 @@ const useHistory = initialState => {
   return [history[index], setState, undo, redo];
 };
 
-const drawElement=(rc, ctx, element) =>{
+const drawElement=(rc, ctx, element,canva_bg) =>{
   switch (element.tool) {
     case 'line':
     case 'rectangle':
@@ -283,7 +278,7 @@ const drawElement=(rc, ctx, element) =>{
 
     case 'eraser':
 
-      ctx.fillStyle = element.color;
+      ctx.fillStyle = canva_bg;
       const eraserStroke = getStroke(element.points, {
         size:element.size
        });
@@ -294,7 +289,6 @@ const drawElement=(rc, ctx, element) =>{
 
     case 'text':
       ctx.textBaseline = 'top';
-      console.log(element.size);
       ctx.font = `bold ${element.size}px Comic Sans MS`;
      
       
@@ -303,9 +297,7 @@ const drawElement=(rc, ctx, element) =>{
       ctx.fillText(element.text, element.x1, element.y1);
       break;
 
-    case 'pan':
-      break;
-
+   
     
     default:
       break;
@@ -355,14 +347,36 @@ const usePressedKeys = () => {
 
   return pressedKeys;
 };
-const downloadf = () => {
+
+const downloadf = (canva_bg) => {
   const canvas = document.getElementById('canvas');
   if (canvas) {
+    const ctx = canvas.getContext('2d');
+
+    // Save the current canvas content
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(canvas, 0, 0);
+
+    // Fill background with desired color (e.g., white)
+    ctx.fillStyle = canva_bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the original content back onto the canvas
+    ctx.drawImage(tempCanvas, 0, 0);
+
+    // Generate image and download
     const image = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.href = image;
     link.download = 'image.png';
     link.click();
+
+    // Restore original canvas content
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(tempCanvas, 0, 0);
   }
 };
 
@@ -386,6 +400,7 @@ export default function Home() {
   const textAreaRef = useRef();
   const reset = useSelector(state => state.options.isReset);
   const canva_bg = useSelector(state => state.options.backgrounds);
+ 
 
   const [selectedElement, setSelectedElement] = useState(null);
   const [elements, setElements, undo, redo] = useHistory([]);
@@ -414,7 +429,7 @@ export default function Home() {
 
   useEffect(() => {
     if (download) {
-      downloadf();
+      downloadf(canva_bg);
       dispatch(setIsDownload(false)); // Reset download state if needed
     }
 
@@ -425,7 +440,7 @@ export default function Home() {
     const canvas = document.getElementById('canvas');
     const rc = rough.canvas(canvas); //create a rough canvas
     const ctx = canvas.getContext('2d'); //get the context of the canvas
-    
+
 
 
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); //we will clear the canvas on every render so that it is empty for the next render
@@ -455,7 +470,7 @@ export default function Home() {
       if (action === "write" && selectedElement.id === element.id) return;
 
     
-      drawElement(rc, ctx, element);
+      drawElement(rc, ctx, element,canva_bg);
     });
     ctx.restore();
     
@@ -471,6 +486,7 @@ export default function Home() {
       }
     }
     document.addEventListener('keydown',undoRedoFunction);
+
     return () => document.removeEventListener('keydown',undoRedoFunction);
   },[undo,redo])
 
@@ -503,19 +519,21 @@ export default function Home() {
   }, [action, selectedElement]);
 
   const updateElement = (index, x1, y1, x2, y2,tool,options) => {
+    
     const elementsCopy = [...elements];
+
+
     
     switch (tool) {
       case 'pen':
       case 'eraser':
-        console.log("pen" , elementsCopy[index]);
         elementsCopy[index].points = [...elementsCopy[index].points, { x: x2, y: y2 }];
         break;
 
       case 'line':
       case 'rectangle':
       case 'circle':
-        elementsCopy[index] =  createElements(index, x1, y1, x2, y2, tool, color, size, fill, style, fillStyle, thinning, smoothing, streamline);
+        elementsCopy[index] =  createElements(index, x1, y1, x2, y2, tool, options.color, options.size, options.fill, options.style, options.fillStyle, options.thinning, options.smoothing, options.streamline);
         break;
 
         
@@ -526,7 +544,7 @@ export default function Home() {
 
         
         elementsCopy[index] = {...createElements[index],tool, x1: x1, y1: y1,x2: x1 + textWidth, y2: y1 + textHeight, text: options.text, color: options.color, size: options.size};
-        console.log(elementsCopy[index]);
+      
         break;
       
       case 'pan':
@@ -551,6 +569,7 @@ export default function Home() {
 
   const handleMouseDown = (e) => {
 
+
     if(action === 'write'){
       return;
     }
@@ -567,6 +586,7 @@ export default function Home() {
     if (tool === 'select') {
       //check if the mouse is over an element
       const element = getElementAtPosition(clientX, clientY, elements);
+    
 
       //if an element is found, set it as the selected element and set the action to move
       if (element) {
@@ -580,7 +600,6 @@ export default function Home() {
 
         const offsetX = clientX - element.x1;
         const offsetY = clientY - element.y1;
-
         setSelectedElement({ ...element, offsetX, offsetY });
         }
         setElements(prevState => prevState); 
@@ -599,11 +618,15 @@ export default function Home() {
       const id = elements.length ;
 
 
-      const element = createElements(id,clientX, clientY, clientX, clientY, tool, color , size , fill , style , fillStyle, thinning , smoothing,streamline); //create the element
+      const element = createElements(id,clientX, clientY, clientX, clientY, tool, color , size , fill , style , fillStyle, thinning , smoothing,streamline); 
+    
+      //create the element
      //add the element to the elements array
      setElements(prevState => [...prevState, element]);
 
+     
       setSelectedElement(element);
+      
       setAction(tool === 'text' ? 'write':'draw');
       
 
@@ -612,6 +635,7 @@ export default function Home() {
 
   const handleMouseMove = (e) => {
     const { clientX, clientY } = getMouseCoordinates(e);
+
 
     if (action === "panning") {
       const deltaX = clientX - startPanMousePosition.x;
@@ -634,19 +658,18 @@ export default function Home() {
 
       const { x1, y1 } = elements[index]
 
+      
+
       //update the position of the mouse
       updateElement(index, x1, y1, clientX, clientY, tool, {
-        color,
-        size,
-        thinning,
-        smoothing,
-        streamline,
-        fill,
-        style,
-        fillStyle,
-        thinning,
-        smoothing,
-        streamline
+        color:elements[index].color,
+        size:elements[index].size,
+        fill:elements[index].fill,
+        style:elements[index].style,
+        fillStyle:elements[index].fillStyle,
+        thinning:elements[index].thinning,
+        smoothing:elements[index].smoothing,
+        streamline:elements[index].streamline
       });
 
     }
@@ -667,6 +690,8 @@ export default function Home() {
       else{
         
         const {id, x1, y1, x2, y2, tool, offsetX,offsetY} = selectedElement;
+
+      
         
         const width = x2 - x1;
         const height = y2 - y1;
@@ -674,17 +699,38 @@ export default function Home() {
         const newX1 = clientX - offsetX;
         const newY1 = clientY - offsetY;
       
-        const options = tool === 'text' ? {text:selectedElement.text, color:selectedElement.color , size:selectedElement.size} : {};
+        const options = tool === 'text' ? {text:selectedElement.text, color:selectedElement.color , size:selectedElement.size} : {
+          color:selectedElement.color,
+          size:selectedElement.size,
+          fill:selectedElement.fill,
+          style:selectedElement.style,
+          fillStyle:selectedElement.fillStyle,
+          thinning:selectedElement.thinning,
+          smoothing:selectedElement.smoothing,
+          streamline:selectedElement.stream
+          
+        };
+
 
         updateElement(id, newX1, newY1, newX1 + width, newY1 + height, tool,options);
       }
     }
     else if(action === 'resize'){
       const {id , tool , position , ...coordinates} = selectedElement;
-
+    
+     
       const {x1,y1,x2,y2 } = resizedCoordinates(clientX,clientY,position, coordinates);
 
-      updateElement(id,x1,y1,x2,y2,tool);
+      updateElement(id,x1,y1,x2,y2,tool,{
+        color:selectedElement.color,
+        size:selectedElement.size,
+        fill:selectedElement.fill,
+        style:selectedElement.style,
+        fillStyle:selectedElement.fillStyle,
+        thinning:selectedElement.thinning,
+        smoothing:selectedElement.smoothing,
+        streamline:selectedElement.stream
+      });
     }
 
 
@@ -707,7 +753,10 @@ export default function Home() {
     const { id, tool } = elements[index];
     if ((action === "draw" || action === "resize") && adjustmentRequired(tool)) {
       const { x1, y1, x2, y2 } = adjustElementCoordinates(elements[index]);
-      updateElement(id, x1, y1, x2, y2, tool);
+     
+      updateElement(id, x1, y1, x2, y2, tool, { color:elements[index].color, size:elements[index].size, fill:elements[index].fill, style:elements[index].style, fillStyle:elements[index].fillStyle, thinning:elements[index].thinning, smoothing:elements[index].smoothing, streamline:elements[index].streamline });
+    
+      
     }
   }
   if(action === 'write'){
@@ -739,6 +788,9 @@ export default function Home() {
         zIndex: 1,
         }} width={windowSize.width} 
         height={windowSize.height}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -751,7 +803,7 @@ export default function Home() {
         onBlur={handleBlur}
        ref={textAreaRef}
        style={{
-         position: "fixed",
+         position: "relative",
          top: (selectedElement.y1-2)*scale+panOffset.y*scale- scaleOffset.y,
          left: (selectedElement.x1)*scale+ panOffset.x*scale-scaleOffset.x,
          font: `${selectedElement.size*scale}px Comic Sans MS`,
