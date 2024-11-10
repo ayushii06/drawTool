@@ -41,10 +41,6 @@ const createElements=(id,x1, y1, x2, y2, tool , color , size ,fill , style, fill
       return { id, tool, points: [{x:x1,y:y1}] , color, size, thinning, smoothing, streamline};
       break;
 
-    case 'eraser':
-      return { id, tool, points: [{x:x1,y:y1}] ,color : 'white', size};
-      break;
-
     case 'text':
       return { id, tool,x1,y1,x2,y2, color , size,  text: '' };
       break;
@@ -159,20 +155,7 @@ const positionWithinElement = (x, y, element) =>{
     case 'text':
       return x >= x1 && x <= x2 && y >= y1 && y <= y2 ? "inside" : null;
 
-    case 'eraser':
-      const betweenAnyPointEraser = element.points.some((point,index) => {
-        const nextPoint = element.points[index + 1];
-        if(!nextPoint) return false;
-
-        return onLine(point.x , point.y , nextPoint.x , nextPoint.y , x,y,5)!=null;
-      });
-
-      const onPathEraser = betweenAnyPointEraser ? "inside" : null;
-
-      return onPathEraser;
-
-      break;
-
+    
   
     default:
       break;
@@ -231,22 +214,48 @@ const useHistory = initialState => {
   const [history, setHistory] = useState([initialState]);
 
   const setState = (action, overwrite = false) => {
-    const newState = typeof action === "function" ? action(history[index]) : action;
+    const newState = (typeof action === "function" )? action(history[index]) : action;
     if (overwrite) {
       const historyCopy = [...history];
       historyCopy[index] = newState;
       setHistory(historyCopy);
-    } else {
+    } 
+    else {
       const updatedState = [...history].slice(0, index + 1);
       setHistory([...updatedState, newState]);
       setIndex(prevState => prevState + 1);
     }
+
   };
 
   const undo = () => index > 0 && setIndex(prevState => prevState - 1);
   const redo = () => index < history.length - 1 && setIndex(prevState => prevState + 1);
 
-  return [history[index], setState, undo, redo];
+  const eraser = (selectedElement) => {
+   
+    const elements = [...history[index]];
+    const elementIndex = elements.findIndex(element => element.id === selectedElement.id);
+
+    if(elementIndex === -1) return;
+
+    else if(elements.length === 1){
+      setHistory([[]]);
+      setIndex(0);
+    }
+    else{
+      elements.splice(elementIndex, 1);
+      setHistory([...history.slice(0, index + 1), elements]);
+      setIndex(prevState => prevState + 1);
+
+      
+    }
+
+    
+
+
+  }
+
+  return [history[index], setState, undo, redo,eraser];
 };
 
 const drawElement=(rc, ctx, element,canva_bg) =>{
@@ -276,16 +285,7 @@ const drawElement=(rc, ctx, element,canva_bg) =>{
       ctx.fill(myPath);
       break;
 
-    case 'eraser':
-
-      ctx.fillStyle = canva_bg;
-      const eraserStroke = getStroke(element.points, {
-        size:element.size
-       });
-      const eraserPath = getSvgPathFromStroke(eraserStroke);
-      const eraser = new Path2D(eraserPath);
-      ctx.fill(eraser);
-      break;
+  
 
     case 'text':
       ctx.textBaseline = 'top';
@@ -400,15 +400,23 @@ export default function Home() {
   const textAreaRef = useRef();
   const reset = useSelector(state => state.options.isReset);
   const canva_bg = useSelector(state => state.options.backgrounds);
- 
-
-  const [selectedElement, setSelectedElement] = useState(null);
-  const [elements, setElements, undo, redo] = useHistory([]);
-  const [action, setAction] = useState('none')
-
   const dispatch = useDispatch();
+  
+    const [selectedElement, setSelectedElement] = useState(null);
+    const [elements, setElements, undo, redo,eraser] = useHistory([]);
+    const [action, setAction] = useState('none')
+  
+  
+    const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  if(reset){
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    setElements([]);
+    dispatch(setIsReset(false));
+  }
+ 
 
   useEffect(() => {
     const handleResize = () => {
@@ -441,17 +449,15 @@ export default function Home() {
     const rc = rough.canvas(canvas); //create a rough canvas
     const ctx = canvas.getContext('2d'); //get the context of the canvas
 
-
-
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); //we will clear the canvas on every render so that it is empty for the next render
-
-    if (reset) {
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
+    if(reset){
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      
-      dispatch(setIsReset(false)); // Reset download state if needed
+   
+      dispatch(setIsReset(false));
+
     }
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
 
     const scaleWidth =canvas.width * scale;
     const scaleHeight = canvas.height * scale;
@@ -466,12 +472,14 @@ export default function Home() {
     ctx.translate(panOffset.x * scale-scaleOffsetX, panOffset.y * scale  - scaleOffsetY);
     ctx.scale(scale, scale);
 
+    if(elements){
     elements.forEach(element => {
       if (action === "write" && selectedElement.id === element.id) return;
 
     
       drawElement(rc, ctx, element,canva_bg);
     });
+  }
     ctx.restore();
     
   },[elements,selectedElement, panOffset, action, scale]);
@@ -526,7 +534,6 @@ export default function Home() {
     
     switch (tool) {
       case 'pen':
-      case 'eraser':
         elementsCopy[index].points = [...elementsCopy[index].points, { x: x2, y: y2 }];
         break;
 
@@ -577,7 +584,6 @@ export default function Home() {
     const { clientX, clientY } = getMouseCoordinates(e);
 
     if (e.button === 1 ||  tool === 'pan') {
-      document.body.style.cursor = 'grabbing';
       setAction("panning");
       setStartPanMousePosition({ x: clientX, y: clientY });
       return;
@@ -610,6 +616,27 @@ export default function Home() {
         else{
           setAction('resize');
         }
+      }
+    }
+    else if(tool === 'eraser'){
+      const element = getElementAtPosition(clientX, clientY, elements);
+
+      if (element) {
+        if(element.tool === 'pen'){
+          const xOffsets = element.points.map(point => clientX - point.x);
+          const yOffsets = element.points.map(point => clientY - point.y);
+
+          setSelectedElement({ ...element, xOffsets, yOffsets });
+        }
+        else{
+
+        const offsetX = clientX - element.x1;
+        const offsetY = clientY - element.y1;
+        setSelectedElement({ ...element, offsetX, offsetY });
+        }
+        setElements(prevState => prevState); 
+
+        setAction('erase');
       }
     }
     else {
@@ -649,7 +676,12 @@ export default function Home() {
 
     if(tool === 'select'){
       const element = getElementAtPosition(e.clientX, e.clientY, elements) 
-      e.target.style.cursor = element ? cursorForPosition(element.position) : 'default';
+      if(element){
+        document.body.style.cursor = cursorForPosition(element.position);
+      }
+      else{
+        document.body.style.cursor = 'default';
+      }
     }
     
     if (action === 'draw') {
@@ -674,7 +706,7 @@ export default function Home() {
 
     }
     else if (action === 'move') {
-      if(selectedElement.tool === 'pen' || selectedElement.tool === 'eraser') {
+      if(selectedElement.tool === 'pen') {
         const newPoints = selectedElement.points.map((point,index) => {
           return {
           x: clientX - selectedElement.xOffsets[index],
@@ -715,7 +747,7 @@ export default function Home() {
         updateElement(id, newX1, newY1, newX1 + width, newY1 + height, tool,options);
       }
     }
-    else if(action === 'resize'){
+    else if(action === 'resize'){ 
       const {id , tool , position , ...coordinates} = selectedElement;
     
      
@@ -732,13 +764,40 @@ export default function Home() {
         streamline:selectedElement.stream
       });
     }
+    else{
+      return;
+    }
+    
 
 
   }
 
+  const handleMouseDoubleClick = (e) => {
+    const { clientX, clientY } = getMouseCoordinates(e);
+
+    if(action === 'erase'){
+      const element = getElementAtPosition(clientX, clientY, elements);
+   
+
+      if (element) {
+        eraser(element);
+      }
+
+      
+    }else{
+      return;
+    }
+  }
+
+
   const handleMouseUp = (e) => {
     const { clientX, clientY } = getMouseCoordinates(e);
 
+    if(action === 'erase'){
+      setAction('none');
+      setSelectedElement(null);
+      return;
+    } else{
     if(selectedElement){
       if (
         selectedElement.tool === "text" &&
@@ -749,9 +808,11 @@ export default function Home() {
         return;
       }
     const index = selectedElement.id
+    if(index === null) return;
+    
 
     const { id, tool } = elements[index];
-    if ((action === "draw" || action === "resize") && adjustmentRequired(tool)) {
+    if ((action === "draw" || action === "resize" ) && adjustmentRequired(tool)) {
       const { x1, y1, x2, y2 } = adjustElementCoordinates(elements[index]);
      
       updateElement(id, x1, y1, x2, y2, tool, { color:elements[index].color, size:elements[index].size, fill:elements[index].fill, style:elements[index].style, fillStyle:elements[index].fillStyle, thinning:elements[index].thinning, smoothing:elements[index].smoothing, streamline:elements[index].streamline });
@@ -762,8 +823,11 @@ export default function Home() {
   if(action === 'write'){
     return;
   }
+
+  
     setAction('none');
     setSelectedElement(null);
+  }
   }
 
   const handleBlur = event => {
@@ -778,11 +842,13 @@ export default function Home() {
 
   }
 
+
   return (
     <>
       <div className="canva">
         <canvas id="canvas" style={{ backgroundColor: canva_bg, 
-        cursor: tool === 'pan' ? 'grab' : tool === 'select' ? 'crosshair' : 'crosshair'
+        
+        cursor: tool === 'pan' ? 'grab' : tool === 'select' ? ' move' : tool === 'eraser' ? 'crosshair' : tool === 'text' ? 'text' : tool === 'rectangle' ? 'crosshair' : tool === 'circle' ? 'crosshair' : tool === 'line' ? 'crosshair' : tool === 'pen' ? 'crosshair' : 'default'
         ,
         position: "absolute",
         zIndex: 1,
@@ -794,6 +860,8 @@ export default function Home() {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          onMouseMoveCapture={handleMouseDoubleClick}
+          onMouseLeave={handleMouseUp}
 
         ></canvas>
       </div>

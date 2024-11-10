@@ -65,20 +65,24 @@ export default function Menu() {
         setSelected({...selected,style:fill})
     }
 
-    const showStrokeTool = tool === 'pen' || tool === 'arrow' || tool === 'line' || tool === 'eraser' || tool === 'rectangle' || tool === 'circle'
+    const showStrokeTool = tool === 'pen'  || tool === 'arrow' || tool === 'line'  || tool === 'rectangle' || tool === 'circle'
 
-    const showColorTool = tool === 'pen' || tool === 'text' || tool === 'arrow' || tool === 'line' || tool === 'rectangle' || tool === 'circle'
+    const showColorTool = tool === 'pen'  || tool === 'text' || tool === 'arrow' || tool === 'line' || tool === 'rectangle' || tool === 'circle'
 
-    const showPenTool = tool === 'pen'
+    const showPenTool = tool === 'pen' 
 
-    const showFillTool = tool === 'rectangle' || tool === 'circle'
+    const showFillTool = tool === 'rectangle'  || tool === 'circle'
 
 
 
 
     return (
         <>
-            {(showStrokeTool || showColorTool || showPenTool || showFillTool) && <div style={{zIndex:100}} className="shadow-lg border-2 absolute top-1 left-2 rounded bg-white px-5 py-2 w-72 max-md:w-36 ">
+            {(showStrokeTool || showColorTool || showPenTool || showFillTool) && <div style={{zIndex:100,height:'70vh',overflowY:'auto',
+            scrollbarColor: '#d8d8d8 #f3f4f6',scrollbarWidth: 'thin',scrollbarGutter: 'revert',
+                scrollTimeline: 'smooth',msOverflowStyle: 'none'
+            }} className="shadow-lg border-2 absolute top-1 left-2 rounded bg-white px-5 py-2 w-72 max-md:w-36 "
+            >
 
                 {showColorTool && <div className="text-start py-2">
                     <h4 className="text-slate-500 max-md:text-sm ">Color</h4>

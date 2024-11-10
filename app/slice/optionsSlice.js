@@ -3,7 +3,8 @@ import {Backgrounds} from '../constant'
 
 const initialState = {
     backgrounds : Backgrounds.WHITE,
-    isDowload : false,
+    isDownload : false,
+    isReset : false
 }
 
 export const optionsSlice = createSlice({
@@ -15,8 +16,10 @@ export const optionsSlice = createSlice({
         },
         setIsDownload: (state, action) => {
             state.isDownload = action.payload
-        }
-       
+        },
+        setIsReset: (state, action) => {
+            state.isReset = action.payload
+        },
     }
 })
 
