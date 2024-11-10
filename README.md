@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Drawing Whiteboard Tool
 
-First, run the development server:
+A powerful and interactive drawing whiteboard tool built with the MERN Stack. This application enables users to create and manipulate drawings with various customizable settings, making it ideal for artists, designers, and anyone looking to explore their creativity.
+
+
+
+
+## Features
+
+- **Shape Drawing** : Create a variety of shapes and freehand drawings on the canvas.
+- **Color Customization** : Change the color of shapes and strokes to suit your design.
+- **Width and Style Adjustment** : Modify stroke width, fill styles, and stroke styles.
+- **Move and Zoom** : Move elements around the canvas and zoom in or out for detailed work.
+- **Undo/Redo** : Reverse or reapply actions to achieve the perfect result.
+- **Download Canvas** : Save your artwork as an image directly from the tool.
+
+## Tech Stack
+
+- Next.js , ReactJs , ReduxToolkit
+- RoughJs , Perfect-Freehand 
+- TailwindCSS
+
+
+
+## Installation
+
+1. Clone the repository.
+
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  git clone https://github.com/ayushii06/drawTool
 ```
+2. Install dependencies
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+  npm install
+  ```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Start the server
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+   npm run dev
+   ```
 
-## Learn More
+## Demo
 
-To learn more about Next.js, take a look at the following resources:
+**[Link](https://draw-tool-seven.vercel.app/)**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Screenshots
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+![Website Screenshot](https://i.ibb.co/Pr0bHLq/Screenshot-2024-11-10-171558.png)
 
-## Deploy on Vercel
+![Working Screenshot](https://i.ibb.co/kmSgCmx/Screenshot-2024-11-10-172804.png)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Feedback
+
+If you have any feedback, please reach out to me at ayushipal06@gmail.com
+
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page to see any open issues or make a pull request.
+
+## Acknowledgements
+
+ - [Perfect-Freehand Library](https://github.com/steveruizok/perfect-freehand)
+ - [RoughJs Library](https://github.com/rough-stuff/rough)
+## License
+
+Distributed under the MIT License.
+
+## Authors
+
+- [AYUSHI PAL](https://www.github.com/ayushii06)
+
